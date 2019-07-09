@@ -1,0 +1,251 @@
+<html>
+
+<head>
+<title>ISTCorkboard</title>
+<meta http-equiv="Page-Enter" content="revealTrans(Duration=10.0,Transition=2)">
+<meta http-equiv="Site-Enter" content="revealTrans(Duration=3.0,Transition=2)">
+<style>
+<!--
+#glowtext{
+filter:glow(color=000000,strength=3);
+width:100%;
+}
+-->
+</style>
+<script language="JavaScript1.2">
+
+function glowit(which){
+if (document.all.glowtext[which].filters[0].strength==3)
+document.all.glowtext[which].filters[0].strength=2
+else
+document.all.glowtext[which].filters[0].strength=3
+}
+
+function glowit2(which){
+if (document.all.glowtext.filters[0].strength==3)
+document.all.glowtext.filters[0].strength=2
+else
+document.all.glowtext.filters[0].strength=3
+}
+
+function startglowing(){
+if (document.all.glowtext&&glowtext.length){
+for (i=0;i<glowtext.length;i++)
+eval('setInterval("glowit('+i+')",150)')
+}
+else if (glowtext)
+setInterval("glowit2(0)",150)
+}
+
+if (document.all)
+window.onload=startglowing
+</script>
+</head>
+
+<body BGCOLOR="#D8E1D2" LINK="#005B00" ALINK="#005B00" VLINK="#004A04"
+BACKGROUND="../no1/images/backimage.gif">
+<table BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="100%">
+  <tr>
+    <td ALIGN="center" BGCOLOR="#AFC09C"><form ACTION METHOD="POST" name="test">
+      <p><!--webbot bot="HTMLMarkup" startspan --><script>
+function warp(){
+window.location=document.test.test2.options[document.test.test2.selectedIndex].value
+}
+</script><!--webbot bot="HTMLMarkup" endspan --> <select
+      NAME="test2" style="background-color: rgb(240,253,240); font-weight: bold" size="1">
+        <option selected value="index.htm">Quick Links </option>
+        <option value="index.htm">-------------------------- </option>
+        <option value="onKeyboard.htm">About ISTCorkboard</option>
+        <option value="od.htm">Office of the Director </option>
+        <option value="cfo.htm">Computer Facilities and Operation</option>
+        <option value="clo.htm">Computer Laboratory Office </option>
+        <option value="dao.htm">Data Administration Office </option>
+        <option value="do.htm">Documentation Office </option>
+        <option value="smo.htm">Systems Management Office</option>
+        <option value="prio.htm">Process Review and Improvement Office </option>
+      </select><a HREF="javascript:warp()" style="text-decoration:none;color:black"><font
+      FACE="Arial"><strong><em>Go!</em></strong></font></a> </p>
+    </form>
+    </td>
+  </tr>
+  <tr>
+    <td VALIGN="top"><img src="images/header.gif" width="634" height="141"
+    alt="ISTCorkboard Vol.1 No.2"></td>
+  </tr>
+</table>
+
+<table BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="600">
+  <tr>
+    <td VALIGN="top" WIDTH="110"><table BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="110">
+      <tr>
+        <td VALIGN="top" WIDTH="110"><!--webbot bot="ImageMap"
+        rectangle="(27,267) (94,294) onkeyboard.htm" rectangle="(37,237) (81,252) links.htm"
+        rectangle="(34,201) (85,221) /itc/istp/etcetera2/index.htm"
+        rectangle="(29,161) (83,185) /itc/corkboard/archives.html" rectangle="(29,125) (88,153) viewpoint.htm"
+        rectangle="(23,91) (90,115) technook.htm" rectangle="(32,56) (80,78) events.htm"
+        rectangle="(30,19) (87,43) updates.htm" src="images/linkbar.gif" alt="Link Bar"
+        border="0" width="109" height="334" startspan --><MAP NAME="FrontPageMap">
+              <AREA SHAPE="RECT" COORDS="27, 267, 94, 294" HREF="onkeyboard.htm">
+              <AREA SHAPE="RECT" COORDS="37, 237, 81, 252" HREF="links.htm">
+              <AREA SHAPE="RECT" COORDS="34, 201, 85, 221" HREF="../../istp/etcetera2/index.htm">
+              <AREA SHAPE="RECT" COORDS="29, 161, 83, 185" HREF="../../archives.html" target="_parent">
+              <AREA SHAPE="RECT" COORDS="29, 125, 88, 153" HREF="viewpoint.htm">
+              <AREA SHAPE="RECT" COORDS="23, 91, 90, 115" HREF="technook.htm">
+              <AREA SHAPE="RECT" COORDS="32, 56, 80, 78" HREF="events.htm">
+              <AREA SHAPE="RECT" COORDS="30, 19, 87, 43" HREF="updates.htm">
+            </MAP>
+            <a href="index.htm"><img src="images/linkbar.gif" alt="Link Bar" border="0" width="109" height="334" ismap usemap="#FrontPageMap"></a> 
+            <!--webbot bot="ImageMap" endspan i-checksum="7850" -->
+          </td>
+      </tr>
+    </table>
+    </td>
+    <td VALIGN="top"><table BORDER="0" CELLSPACING="0" CELLPADDING="11" WIDTH="490">
+      <tr>
+        <td VALIGN="top"><font face="Impact" size="5" color="#8BAA79"><strong><span id="glowtext">DLS-PSI
+        Faculty Manual</span></strong></font><font SIZE="2">
+            <p><font face="Verdana">The Board of Trustees of the DLS-PSI last 
+              April 16, 1999 has already signed the DLSU Professional Schools 
+              Inc. Faculty Manual for the School Years 1999 &#150; 2002. Members 
+              of the Technical Panel were: Dean Lydia B. Echauz and Dr. Pablo 
+              Mangaran from GSB; <img
+        src="images/fmanual.JPG" width="250" height="206" alt="Faculty Manual" align="right">Dean 
+              Jonathan Dayao, Philip Chan, and Kai Shan Fernandez from CCS; and 
+              our very own Sammy Mallare and Nick Bonao. The Technical Panel was 
+              headed by the DLS-PSI Executive Vice-President, Mr. Glenn Sipin.</font></p>
+        <p><font face="Verdana">Among the major additions from the last year&#146;s manual is the
+        sensational inclusion of the rice and laundry subsidy which was later amended for
+        cancellation by a majority vote among the ISTPs. Another is the option to teach within
+        DLSU-Manila (outside residency hours). And the most preferred addition was the conversion
+        of unused sick leaves (maximum of 10) for the school year to its cash equivalent.</font></p>
+        <p><font face="Verdana">The faculty manual is stipulated for us to know clearly our rights
+        and benefits and serves as our guide on how to properly assert and avail these privileges.
+        We should also make the stipulated concessions as motivating factors for each of us to
+        satisfactorily carry out our duties and responsibilities.</font></p>
+        </font><p ALIGN="left"><font SIZE="+2" face="Impact" color="#8BAA79"><strong><span
+        id="glowtext">DLSU Gets ORACLE Financials</span></strong></font></p>
+        <p align="left"><font face="Verdana"><small>With consultation and coordination between
+        System Finance, Accounting, Internal Auditor, and IT offices, De La Salle University
+        System selected Oracle Financials/Payroll as its Enterprise Resource Planning (ERP)
+        system.&nbsp;This will take care of automating various operations in all five
+        campuses.&nbsp;This will also solve all Y2K-related concerns for some computerized
+        systems.</small><br>
+              <em><font color="#000080"><small>(<a href="od.htm"
+        style="text-transform: none; text-decoration: none; color: rgb(0,0,128)">click 
+              here for the whole story...</a>)</small></font></em></font>
+          </td>
+      </tr>
+    </table>
+    </td>
+  </tr>
+</table>
+<div align="left">
+
+<table border="0" width="600">
+  <tr>
+    <td width="113"></td>
+    <td width="487" colspan="2" bgcolor="#26311E"><strong><font face="Verdana" color="#FFFFFF">&nbsp;&nbsp;
+    </font></strong><small><font color="#B7C9A7" face="Verdana">In this edition:</font></small></td>
+  </tr>
+  <tr>
+    <td width="113" bgcolor="#B7C9A7"><p align="center"><font color="#BCCDAD">...</font></td>
+    <td width="238" bgcolor="#9EB379">
+        <p align="center"><a href="awardees.htm"
+    style="color: rgb(0,74,4); text-transform: none; text-decoration: none"><font
+    face="Verdana" color="#004A04">ISTP Service Awardees</font></a>
+      </td>
+    <td width="249" bgcolor="#9EB379">
+        <p align="center"><font face="Verdana" color="#004A04"><a
+    href="assembly.htm"
+    style="color: rgb(0,74,4); text-transform: none; text-decoration: none">ISTP 
+          Assembly Officers</a></font>
+      </td>
+  </tr>
+  <tr>
+    <td width="113" bgcolor="#B7C9A7"><p align="center"><font color="#BCCDAD">...</font></td>
+    <td width="238" bgcolor="#C9CA93"><p align="center"><a
+    HREF="../../istp/etcetera2/fathers.htm" style="text-transform: none; text-decoration: none"><font
+    face="Verdana" color="#004A04">Father's Day Special</font></a></td>
+    <td width="249" bgcolor="#C9CA93"><p align="center"><a
+    HREF="../../istp/etcetera2/strategy.htm"
+    style="color: rgb(0,74,4); text-transform: none; text-decoration: none"><font
+    face="Verdana" color="#004A04">Strategies for Advancement</font></a></td>
+  </tr>
+</table>
+</div>
+
+<p>&nbsp;</p>
+<div align="left"><table BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="100%">
+
+<tr>
+  <font FACE="arial">
+    <td WIDTH="20"><p ALIGN="center"><font COLOR="#E6EADF">.</font></td>
+    </font>
+      <td WIDTH="572"><font FACE="arial"></font><font SIZE="-1" FACE="Tahoma"><a HREF="http://www.dlsu.edu.ph"
+    TARGET="_parent"
+    onmouseover="status='De La Salle University-Manila Home Page';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[DLSU-Manila]</a> 
+        <a HREF="updates.htm" TARGET="_self" onmouseover="status='Updates';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Updates]</a> 
+        <a HREF="events.htm" TARGET="_self" onmouseover="status='Events';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Events]</a> 
+        <a HREF="../../istp/etcetera2/index.htm" TARGET="_self"
+    onmouseover="status='Etcetera. ISTC Access Only';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Etcetera]</a> 
+        <a HREF="technook.htm" TARGET="_self" onmouseover="status='Tech Nook';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Tech 
+        Nook]</a></font><font FACE="Tahoma"><small> </small></font><font SIZE="-1" FACE="Tahoma"><a
+    HREF="viewpoint.htm" onmouseover="status='Viewpoint';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Viewpoint]</a> 
+        <a HREF="../../archives.html" TARGET="_parent" onmouseover="status='Archive';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Archive]</a> 
+        <a HREF="links.htm" TARGET="_self" onmouseover="status='Links';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[Links]</a> 
+        <a HREF="onkeyboard.htm" TARGET="_self" onmouseover="status='onKeyboard';return true"
+    onmouseout="status='ISTCorkboard'" style="text-transform: none; text-decoration: none">[OnKeyboard]</a></font></td>
+  </tr>
+</table>
+</div>
+
+<hr SIZE="3">
+
+<table BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="600">
+  <tr>
+  <td WIDTH="33">
+    <p ALIGN="center"><font FACE="arial"></font><font COLOR="#E6EADF">..</font></td>
+    <td WIDTH="572"><font FACE="Arial Narrow"><a HREF="http://www.dlsu.edu.ph/legal.htm"
+    TARGET="_self" style="color: rgb(0,0,0); text-transform: none; text-decoration: none">Copyright
+    ©</a> 1999. All Rights Reserved</font><br>
+    <a HREF="http://www.dlsu.edu.ph/psi/istc.htm" TARGET="_parent"
+    style="text-transform: none; text-decoration: none"><small><font FACE="Nasalization">Information
+    Systems and Technology Center</font></small></a><br>
+    <font FACE="Arial Narrow"><a HREF="http://www.dlsu.edu.ph/psi" TARGET="_parent"
+    style="color: rgb(0,0,0); text-transform: none; text-decoration: none">De La Salle
+    University - Professional Schools, Inc.</a><br>
+    2401 Taft Avenue 1004 Manila, Philippines<br>
+    Telephone Number: (632) 526 4242<br>
+    Fax Number: (632) 526 5063</font><p><font color="#616222" face="Arial"><small>No part of
+    this site may be reproduced or transmitted in any form or by any means, electronic or
+    mechanical, including photocopying, recording or by any information storage and retrieval
+    system, without permission in writing from the Information Systems and Technology Center.</small></font></td>
+  </tr>
+</table>
+<div align="left">
+
+<table BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="600">
+  <tr>
+    <td WIDTH="33"></td>
+    <td WIDTH="572">&nbsp;<p><font FACE="Lucida Sans"><small>You may send your <a
+    HREF="mailto:csclbc@mail.dlsu.edu.ph" TARGET="_self"
+    style="text-transform: none; text-decoration: none; color: rgb(0,0,0)">comments </a>to the
+    <a HREF="http://www.dlsu.edu.ph/Webdev.htm" TARGET="_self"
+    style="text-transform: none; text-decoration: none; color: rgb(0,0,0)">Web Development
+    Team</a>.</small><br>
+    </font><small><small><font FACE="Arial">cscfmds <!--webbot bot="Timestamp" startspan
+    S-Type="EDITED" S-Format="%m/%d/%y" -->07/17/00<!--webbot bot="Timestamp" i-checksum="12338"
+    endspan --></font></small></small></td>
+  </tr>
+</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+Received: from SpoolDir by NETWARE6 (Mercury 1.44); 14 Sep 00 16:42:54 GMT+8
+From: "csccvr@dlsu.edu.ph" <csccvr@mail.dlsu.edu.ph>
+Organization: De La Salle University
+To: cscjvb@mail
+Date: Thu, 14 Sep 2000 16:42:43 +0800
+MIME-Version: 1.0
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+Subject: (Fwd) istcorkboard
+Reply-to: csccvr@dlsu.edu.ph
+Message-ID: <39C10001.31078.1571125@localhost>
+Priority: normal
+X-mailer: Pegasus Mail for Win32 (v3.12c)
+X-PMFLAGS: 524416 0 1 Y05866.CNM
+
+don't know if this has been included in the previous newsletter ('di ko pa 
+tapos basahin ito).
+thanks.
+celine
+
+------- Forwarded message follows -------
+From:           	"Samuel P. Mallare" <cscspm.ISTC.DLSU-MANILA@mail.dlsu.edu.ph>
+To:             	csccvr@mail.dlsu.edu.ph
+Date sent:      	Tue, 21 Mar 2000 17:03:04 GMT+8
+Subject:        	istcorkboard
+Priority:       	normal
+
+pls post in corkboard in the next issue before this gets lost in my
+mailbox.  tnx.
+
+sammy
+
+------- Forwarded Message Follows -------
+
+things to check:
+
+...aside from the basic subject-predicate agreement.
+
+1. consistency (in sentences, paragraphs, sections, et al)
+    - singular or plural
+    - present, future, or past
+    - active or passive voice
+    - e.g., use "enrol" (french spelling) _or_ "enroll" (american
+      spelling) but not both...even though both are correct.
+
+2. using numbers in documentation (excluding flowcharts)
+    - e.g., one (1) object
+
+3. antecedent of pronouns
+    - e.g., The clerk fills out the form and checks that 
+            his/her ID number is correct.
+            ...sometimes, "its" (not used for persons)
+             is used instead of his/her (used for persons)
+
+4. hyphenation
+    - follow-up = adjective, noun, or adverb
+      e.g., follow-up interview; filled-out form
+    - follow up = verb
+      e.g., he followed up (or follows up) the document
+      i'm not really sure if there's a hyphenated verb.
+
+5. use of comma and semi-colon
+    - after e.g. and i.e.
+        => e.g., one, two, and three.
+    - series (same for "and" and "or")
+        => They are Peter, James, and John.
+        => His functions are washing the dishes; scrubbing the
+           floor; and cleaning the windows.
+
+6. use active voice in flowcharts, procedures, and instructions
+   ...2nd person (i.e., "you" perspective instead of "he/she") 
+      when applicable
+   - e.g., get the Form-A
+
+7. for procedures, use simple terms.
+   - don't use "per" unless you mean "every" or "each"
+   - ensure that things will not be misinterpreted
+   - assume a reader with "little or no knowledge"
+   - KISS - keep is simple silly
+     originally, "keep it simple stupid"...those americans.  :)
+
+8. capitalization
+   - e.g., university is a common noun.  but when we pertain it
+     to a specific institution (like DLSU), capitalize it.
+     something like...
+
+     ISTC is the...De La Salle University.  Its role in the
+     University is...  Next school year, the Center will be...
+
+     - center is capitalized because it pertains to a proper
+       noun already.
+
+9. it's and its
+   - "it's" - an abbreviation of "it is"
+   - its - means ownership by something
+           e.g., its color - means the color of "it"
+
+of course, english is really a dynamic (or weird, as some would put
+it) language.  the above tips are strict/formal implementation of
+grammar rules.  slang, informal, or IT forms (e.g., backup and
+database) sometimes become accepted into the formal version.  well, at
+least IT words/terms in IT documents.
+
+for example, there's no such word as "etc." formally, that is.  this
+is why "et al" or "et cetera" is used.  but so many use "etc." (for
+convenience), it became accepted...dunno yet if it's considered a
+"formal" abbreviation already.
+
+thanks.
+
+sammy
+------- End of forwarded message -------
+
+-- End --

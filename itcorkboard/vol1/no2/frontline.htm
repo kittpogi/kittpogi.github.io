@@ -1,0 +1,37 @@
+<html>
+
+<head><script LANGUAGE="Javascript">
+
+<!-- Begin
+var Message="Welcome to the ISTCorkboard second issue!";
+var place=1;
+function scrollIn() {
+window.status=Message.substring(0, place);
+if (place >= Message.length) {
+place=1;
+window.setTimeout("scrollOut()",300); 
+} else {
+place++;
+window.setTimeout("scrollIn()",50); 
+   } 
+}
+function scrollOut() {
+window.status=Message.substring(place, Message.length);
+if (place >= Message.length) {
+place=1;
+window.setTimeout("scrollIn()", 100);
+} else {
+place++;
+window.setTimeout("scrollOut()", 50);
+   }
+}
+// End -->
+</script>
+
+<title>ISTCorkboard</title>
+</head>
+
+<body BGCOLOR="#B6C6AC" BACKGROUND="../no1/images/headerback.gif"
+onLoad="scrollIn()">
+</body>
+</html>

@@ -1,0 +1,217 @@
+<html>
+
+<head>
+<style>
+    BODY {background: orange}
+  </style>
+<base TARGET="insideDHTML">
+<title>DHTMLLib - Mars Expedition Puzzle</title>
+<script SRC="../4tris/dhtmlLib.js" LANGUAGE="JavaScript">
+
+    // cross platform library
+  
+
+</script>
+<script
+LANGUAGE="Javascript">
+
+    var curpos=-1
+    var move=0
+    function testGame() {
+      var ok
+      for (var i=1; i<=24; i++) {
+        // double slash to escape the character
+        var s = document.all["i"+i].src.lastIndexOf("\\")
+        if (-1==s) s = document.all["i"+i].src.lastIndexOf("/")
+        ok = document.all["i"+i].src.substring(s+1)=="img"+i+".jpg"
+        if (!ok) return false
+      }
+      separate(0);
+      alert ("You Win!")
+      document.all["i25"].src="img25.jpg"
+      setVisibility(document.all["D25"],"visible")     
+      return true;
+    }
+
+    function doMouseUp() {
+      if (null!=event.srcElement.name)
+      if ("i"==event.srcElement.name.substring(0,1)) {
+        var curNum = parseInt((event.srcElement.name.substring(1)))
+        var ok=false
+        if (curNum<curpos)
+          ok = (curNum+1==curpos) || (curNum+5==curpos)
+        else
+          ok = (curNum-1==curpos) || (curNum-5==curpos)
+        if (ok) {
+          move++
+          setContent(document.all.move,"<STRONG>Move #</STRONG>"+move)
+          var temp = document.all["i"+curpos].src
+          document.all["i"+curpos].src = document.all["i"+curNum].src
+          document.all["i"+curNum].src = temp
+          setVisibility(document.all["D"+curpos],"visible")
+          setVisibility(document.all["D"+curNum],"hidden")
+          curpos = curNum
+          testGame();
+        }
+      }
+    }
+
+    function randomize(w) {
+      var ar = new Array()
+      for (var i=0;i<24;i++) {
+        ar[i] = new Object;
+        ar[i].pos = i+1
+        if (w) 
+          ar[i].ran = Math.random() 
+        else 
+          ar[i].ran = 1
+      }
+      // bubble sort
+
+      var n=ar.length
+      for (var i=0; i<n-1; i++)
+        for (var j=n-1; i<j;j--) {
+          var pj = ar[j]
+          var pj1 = ar[j-1]
+          if (pj.ran<pj1.ran) {
+            temp = pj
+            ar[j] = pj1
+            ar[j-1] = pj
+          }
+        }
+      return ar
+    }
+
+    var ilist = randomize(true);
+
+
+    function separate(space) { 
+      if (null==document.all) {
+        alert("Game is still loading. Please wait...")
+        return
+      }
+      var count = 0
+      var itop = 200, ileft = 50, width = 64, height = 48
+      if (space==1) {
+        setVisibility(document.all["D25"],"hidden")
+        curpos=25
+        move =1;
+        setContent(document.all.move,"<STRONG>Move #</STRONG>"+move)
+        document.onmouseup=doMouseUp;
+        ilist = randomize(true);
+      } else {
+        if (move>0)
+          setContent(document.all.move,"<STRONG>You cheated at move #</STRONG>"+move+"!")
+
+        curpos=-1
+        ilist = randomize(false)
+        setVisibility(document.all["D25"],"visible")
+        document.all["i25"].src="img25.jpg"
+        document.onmouseup=null;
+      }
+      for (var intLoop=1; intLoop<=25; intLoop++) {
+        var el = document.all["D"+intLoop]
+
+        if (intLoop!=25) {
+          document.all["i"+intLoop].src = "img"+ilist[intLoop-1].pos+".jpg"
+          setVisibility(document.all["D"+intLoop],"visible")
+        }
+        count++
+        setPosition(el, itop, ileft)
+        itop+=height+space
+        if (5==count) {
+          count=0; itop = 200; ileft+=width+space   
+        }
+      }
+      // No click event on the image so must use the onmouseup.
+
+    }
+  
+
+</script>
+</head>
+
+<body>
+<div CLASS="heading" STYLE="position: absolute; top: 5px; left: 50px; width: 550px">
+
+<h1>Mars Expedition</h1>
+
+<p>Enjoy this <em>very</em> challenging puzzle. The goal is to put the Rover and Mars back
+together!</p>
+
+<form>
+  <p><input TYPE="button" VALUE="Play Puzzle" ONCLICK="separate(1)"> <input TYPE="button"
+  VALUE="Solve Puzzle" ONCLICK="separate(0)"> <input TYPE="button" VALUE="Close"
+  ONCLICK="window.close()"> </p>
+</form>
+</div><div STYLE="position: absolute; top: 445; left: 50; width: 320px" ID="move">
+
+<p>&nbsp;</p>
+</div><div STYLE="position: absolute; top: 200; left:50px" ID="D1">
+<dd><img NAME="i1" SRC="img1.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 248; left:50px" ID="D2">
+<dd><img NAME="i2" SRC="img2.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 296; left:50px" ID="D3">
+<dd><img NAME="i3" SRC="img3.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 344; left:50px" ID="D4">
+<dd><img NAME="i4" SRC="img4.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 392; left:50px" ID="D5">
+<dd><img NAME="i5" SRC="img5.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 200; left:114px" ID="D6">
+<dd><img NAME="i6" SRC="img6.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 248; left:114px" ID="D7">
+<dd><img NAME="i7" SRC="img7.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 296; left:114px" ID="D8">
+<dd><img NAME="i8" SRC="img8.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 344; left:114px" ID="D9">
+<dd><img NAME="i9" SRC="img9.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 392; left:114px" ID="D10">
+<dd><img NAME="i10" SRC="img10.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 200; left:178px" ID="D11">
+<dd><img NAME="i11" SRC="img11.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 248; left:178px" ID="D12">
+<dd><img NAME="i12" SRC="img12.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 296; left:178px" ID="D13">
+<dd><img NAME="i13" SRC="img13.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 344; left:178px" ID="D14">
+<dd><img NAME="i14" SRC="img14.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 392; left:178px" ID="D15">
+<dd><img NAME="i15" SRC="img15.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 200; left:242px" ID="D16">
+<dd><img NAME="i16" SRC="img16.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 248; left:242px" ID="D17">
+<dd><img NAME="i17" SRC="img17.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 296; left:242px" ID="D18">
+<dd><img NAME="i18" SRC="img18.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 344; left:242px" ID="D19">
+<dd><img NAME="i19" SRC="img19.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 392; left:242px" ID="D20">
+<dd><img NAME="i20" SRC="img20.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 200; left:306px" ID="D21">
+<dd><img NAME="i21" SRC="img21.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 248; left:306px" ID="D22">
+<dd><img NAME="i22" SRC="img22.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 296; left:306px" ID="D23">
+<dd><img NAME="i23" SRC="img23.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 344; left:306px" ID="D24">
+<dd><img NAME="i24" SRC="img24.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 392; left:306px" ID="D25">
+<dd><img NAME="i25" SRC="img25.jpg" width="64" height="48"></dd>
+</div><div STYLE="position: absolute; top: 200; left: 390; width: 190"><font SIZE="-1">
+
+<p>This image is one of the many images from the Mars expedition available from <a
+href="http://www.nasa.gov" target="main" STYLE="color: #CC0000;font-weight: bold">NASA's
+web-site</a>.</p>
+
+<p><a href="positioning/demos/games.asp" TARGET="main" ONCLICK="window.close()"
+STYLE="color: navy;">DHTMLLib</a> lets this run on Navigator 4.0 and Internet Explorer
+4.0. </p>
+
+<p>More <a href="positioning/demos/games.asp" target="main" ONCLICK="window.close()"
+STYLE="color: navy;">Fun and Games</a> if you have some free time.</p>
+
+<p><a href="home.asp" TARGET="main" onclick="window.close()" ID="home"
+STYLE="color: navy; font-size: 8pt">www.insideDHTML.com</a></p>
+</font></div>
+</body>
+</html>

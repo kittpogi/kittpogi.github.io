@@ -1,0 +1,31 @@
+/* 	Center text on body to center all elements in body for IE5x PC */
+body {text-align: center;}
+
+/* 	Counteract the individual elements so that text is not centered,
+	only the elements */
+#header, #sidebar, #footer {text-align: left;}
+#maincontent {text-align: justify;}
+
+/* 	You can eliminate the above three rules if you do not care
+	that the layout is not centered in IE5 PC */
+
+#header h1 {
+	/* IEPC does not support min-width but we
+	simulate it by setting the width of a block
+	level element in the header. */
+	width: 600px;
+}
+
+/* Fixes Display: Block issue in IE5.5 and 6x */
+#nav a {zoom: 100%;}
+
+/* Fixes Display: Block issue in IE5 */
+#nav a {height: 1em;}
+
+#footer p {
+	margin: 0;
+	/* IEPC does not support min-width but we
+	simulate it by setting the width of a block
+	level element in the footer. */
+	width: 650px;
+}

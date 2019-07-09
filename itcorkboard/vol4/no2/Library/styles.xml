@@ -1,0 +1,8 @@
+<mm:style name="bold green " type="char" apply="replace" font="Verdana, Arial, Helvetica, sans-serif" size="2" color="#009900" bold />
+<mm:style name="dark green" type="char" apply="replace" font="Arial, Helvetica, sans-serif" size="3" color="#00480B" bold />
+<mm:style name="headline" type="char" apply="replace" font="Arial, Helvetica, sans-serif" size="5" color="#CC6633" bold />
+<mm:style name="sub-title_dark brown" type="char" apply="replace" font="Trebuchet MS, Arial, Helvetica" size="3" color="#993300" bold underline />
+<mm:style name="text" type="char" apply="replace" font="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000" />
+<mm:style name="text_small" type="char" apply="replace" font="Verdana, Arial, Helvetica, sans-serif" size="1" color="#000000" />
+<mm:style name="title-brown" type="char" apply="replace" font="Trebuchet MS, Arial, Helvetica" size="3" color="#996633" bold underline />
+<mm:style name="title-italic" type="char" apply="replace" font="Verdana, Geneva, sans serif" size="1" italic />

@@ -1,0 +1,27 @@
+<!--  Created by: DLSU Web Development Team (webmaster@dlsu.edu.ph) on 06/11/03 --
+
+
+A:link 	{ color: #004000; text-decoration: underline}
+A:visited { color: #004000; text-decoration: underline}
+A:hover { color: #0080FF; text-decoration: none}				
+A:active { color: #004000; text-decoration: underline}
+
+p.content a:link {color: #CC5200; text-decoration: none}
+p.content a:visited {color: #CC5200; text-decoration: none}
+p.content a:hover {color: #0080FF; text-decoration: underline}
+p.content a:active {color: #CC5200; text-decoration: none}
+
+p {font-family: verdana, arial, helvetica, sans-serif; color: #000000;font-size: 11px;}
+li {font-family: verdana, arial, helvetica, sans-serif; color: #000000;font-size: 11px;}
+td {font-family: verdana, arial, helvetica, sans-serif; color: #000000;font-size: 11px;}
+ol {font-family: Verdana, Geneva, "sans serif"; font-size: 8pt}
+p.title {font-family: trebuchet ms, arial, helvetica sans-serif; color: #993300;font-size: 16px; font-weight: bold;}
+p.author {font-family: verdana, arial, helvetica, sans-serif; color: #000000;font-size: 10px; font-style: italic; }
+p.heading {font-family: arial, helvetica sans-serif; color: #000000;font-size: 12px; font-weight: bold;}
+
+#dateno { position: absolute; left:160px; top:80px; z-index:25 }
+
+#shortcut { position: absolute; left: 375px; top: 15px; z-index: 10; visibility: visible; }
+
+
+//-->

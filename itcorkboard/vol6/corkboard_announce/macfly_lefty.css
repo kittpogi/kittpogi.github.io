@@ -1,0 +1,86 @@
+body {
+	background-color: #B9C6AB;
+	margin: 0px;
+	padding: 0px;
+	font-family: "Trebuchet MS", Arial, sans-serif;
+	font-size: 101%;
+	color: #333333;
+}
+
+a{
+	text-decoration: underline;
+	color: black;
+}
+
+a:hover{
+	text-decoration: none;
+	color: black;
+}
+
+#header {
+	height: 94px;
+	min-width: 600px;
+	background-color: #FFFFFF;
+	background-image: url(cork_headbg.gif);
+}
+#header h1 {
+	margin: 0;
+	width: 600px;
+}
+#mainwrapper {
+	width: 650px;
+	margin: 0px auto;
+	padding: 0 12px;
+}
+#maincontent {
+	float: left;
+	width: 400px; /* 520 + 18 + 2 = 540 */
+	margin: 0;
+	padding: 0 0 18px 18px;
+	border-left: 2px dotted #fff;
+	text-align: justify;
+	font-size: .9em;
+}
+#sidebar {
+	float: left;
+	width: 120px; /* 162 + 18 + 2 = 180 */
+	padding: 0 18px 0 0;
+	font-size: .8em;
+}
+#nav {margin: 1em 0 0 0; padding: 0;}
+
+hr {
+   color:#B9C6AB;
+	border-bottom: 1px dashed white;
+}
+
+#nav li {
+	margin: 0 0 1px 0;
+	padding: 0;
+	list-style-type: none;
+}
+#nav a, #nav a:visited {
+	text-decoration: none;
+	padding: 3px;
+	border: 1px solid #FFFFFF;
+	display: block;
+	background-color: #99A189;
+	color: #FFFFFF;
+}
+#nav a:hover, #nav a:active, #nav a:focus {
+	color: #333;
+	background-color: #D1D7B3;
+}
+h2 {font-size: 1.2em; margin: 24px 0px 0px;}
+#footer {
+	clear: both;
+	background-color: #FFFFFF;
+	font-size: 0.7em;
+	padding: 8px;
+	min-width: 650px;
+	border-bottom: 2px dashed #B9C6AB;
+}
+#footer p {
+	margin: 0;
+	width: 728px;
+}

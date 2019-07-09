@@ -1,0 +1,891 @@
+<html>
+
+<head>
+<title>DHTMLLib - 4-Tris!</title>
+<base TARGET="insideDHTML">
+<script SRC="dhtmlLib.js" LANGUAGE="JavaScript">
+
+</script>
+<script>
+    function doLoad() {
+      setup(); 
+      for (var i=0; i<140; i++) {
+        setColor(document.all["C"+i],"black")
+        table[i] = document.all["C"+i]
+
+      }
+      document.onkeypress = doKeyPress;
+
+    }
+   window.onload=doLoad;
+
+  </script>
+<script
+language="javascript">
+
+  var tm = null // global timer storage 
+
+  function SetupGame() {
+    this.newGame=true                      // flag that game is starting
+    this.rows=14                           // number of rows in grid
+    this.cols=10                           // number of cols in grid
+    this.curPos = 0                        // current position of current piece
+    this.colOffset = 0                     // min-offset for piece
+    this.maxOffset = 5                     // max-offset for piece
+    this.startLevel = 1                    // start level for game
+
+    // array of colors for each piece. Add more color values if desired
+    this.colorList = new Array("red","blue","green")
+    this.bgColor = "black"                 // board background color    
+    this.colorCurrent = this.colorList[0]  // color of current piece
+    this.score = 0                         // current score
+    this.inprocess=false                   // flag if game is in-process
+    this.shape = new Array()               // Array for current shape
+    this.shapeList = new Array()           // Array of available shapes
+    this.defaults = new Array()            // Defaults
+    // These define the positions in a 5x5 grid that 
+    // create the 4 default shapes
+    this.defaults[0] = new Array(10,11,12,13)  // bar
+    this.defaults[1] = new Array(7,11,12,13)   // t
+    this.defaults[2] = new Array(8,11,12,13)   // right L
+    this.defaults[3] = new Array(6,11,12,13)   // left L
+    this.defaults[4] = new Array(6,7,11,12)
+    this.defaults[5] = new Array(7,8,11,12)
+    this.defaults[6] = new Array(6,7,12,13)
+    this.shapeList = this.defaults         // start with the default shapes
+
+    // default speeds for each level
+    this.speeds = new Array(1500,1400,1300,1200,1100,1000,900,800,700,600)
+    this.level=this.startLevel             // current level
+
+    this.last=0                            // last output position of current piece
+    this.speed = this.speeds[this.startLevel]  // current game speed
+    this.temp = this.speed                 // temp speed for individual piece-used for space-bar
+    this.keys = new Object()
+    this.keys.rotleft=105   // I
+    this.keys.rotright=107  // K
+    this.keys.left=106      // J
+    this.keys.right=108     // L
+    this.keys.drop=32      // <space>
+  }
+
+  // initialize the game array.
+  window.game = new SetupGame
+  var table = new Array(game.rows*game.cols)
+  var colors = new Array(game.rows*game.cols)
+
+  function getColOffset(s){
+    game.colOffset = 5
+    game.maxOffset = 0
+    var col=0
+    for (var intLoop=0;intLoop<s.length;intLoop++) {
+      col = s[intLoop]%5
+      if (game.colOffset>col) game.colOffset= col
+      if (game.maxOffset<col) game.maxOffset = col
+    }
+    game.maxOffset = 5-game.maxOffset
+  }
+
+  function transform(dir) {
+    // do a 5x5 grid transform
+    var tempShape = new Array(game.shape.length), shapeRow=0, newLast=5
+    for (var i=0;i<game.shape.length;i++)  {
+        shapeRow =  Math.floor((game.shape[i])/5)
+        if ("left"==dir)
+          tempShape[i] = ((4-((game.shape[i])%5))*5)+shapeRow
+        else
+          tempShape[i] = ((game.shape[i])%5)*5+(4-shapeRow)
+        shapeRow = Math.floor(tempShape[i]/5)
+        if (newLast>shapeRow)
+            newLast=shapeRow
+    }
+    paintIt(0,game.bgColor)
+    for (var i=0;i<game.shape.length;i++) 
+        game.shape[i] = tempShape[i]
+    game.last=newLast
+    getColOffset(game.shape)
+    paintIt(0,game.colorCurrent)
+  }
+
+  function outScore() {
+    game.level = Math.ceil((game.score+1)/10)
+    game.speed = (game.level-1<game.speeds.length) ? game.speeds[game.level-1] : 350
+    setContent(document.all.score,"Score: " + game.score); setContent(document.all.level,"Level: " +game.level)
+  }
+
+  function getOffset(pos,amount) {      
+    return game.curPos+((pos)%5)+amount-((Math.floor(pos/5)-game.last)*game.cols) - game.colOffset  
+  }
+
+  function check(offset) {
+    // verify the next position
+    var block = false, nextpos=0
+    for (var i=game.shape.length-1;i>=0;i--) {
+        nextpos = getOffset(game.shape[i],offset)
+        if ((nextpos>=(game.rows)*game.cols) || (colors[nextpos])) {
+            block=true
+            break
+        }
+    }
+    if (block) {
+        if (1==arguments.length) 
+            for (var i=game.shape.length-1;i>=0;i--) {
+                nextpos = getOffset(game.shape[i],0)
+                if (nextpos>=0)
+                    colors[nextpos] = true
+                else {
+                    clearTimeout(tm)
+                    game.inprocess=false // game over
+                }
+            }
+    }
+    return block
+  }                     
+
+  function boundary(offset) {
+    // don't move left or right across board boundaries
+    var nextpos=0, startCol=game.cols, endCol=0
+    for (var i=game.shape.length-1;i>=0;i--) {
+        nextpos = (game.curPos%game.cols)+((game.shape[i])%5) - game.colOffset
+        if (nextpos<startCol) startCol=nextpos
+        if (nextpos>endCol) endCol=nextpos
+    }
+    passed =  (startCol+offset>=0)
+    passed =  passed && (endCol+offset<game.cols)
+    return passed
+  }
+
+  function paintIt(amount,color) {
+    var intOffset
+    for (var i=game.shape.length-1;i>=0;i--) {
+        intOffset = getOffset(game.shape[i],amount)
+        if (intOffset>=0) 
+            setColor(table[intOffset], color)
+
+    }
+  }
+
+  function offset(amount) {
+    paintIt(0,game.bgColor)
+    paintIt(amount,game.colorCurrent)
+    game.curPos+=amount
+  }
+        
+  function checkRows() {
+    // check for completed row
+    var noRow=true
+    var gotit=0
+    var count=0
+    var startcell
+    for (var row=0;row<game.rows;row++) {
+        noRow=false
+        startcell=count
+        for (var cell=0;cell<game.cols;cell++) {
+            if (!colors[count])
+                noRow=true
+            count++
+        }
+        if (!noRow) {
+            gotit++
+            game.score++
+            for (var kill=startcell;kill<startcell+game.cols;kill++) {
+                colors[kill] = false
+                setColor(table[kill], game.bgColor)
+            }
+            for (var kill=startcell-1;kill>=0;kill--) {
+                colors[kill+game.cols] = colors[kill]
+                setColor(table[kill+game.cols], table[kill].style.backgroundColor)
+            }
+        }
+    }
+    if (gotit>0) {
+
+      setContent(document.all.comment,"<STRONG>Great Job!</STRONG>")
+      if (gotit>1) 
+         game.score+=gotit // give bonus
+      outScore() 
+    }
+  }
+                                        
+  function selectShape() {
+    if (tm!=null) clearTimeout(tm)
+    var newShape=Math.ceil(Math.random()*game.shapeList.length)
+    game.colorCurrent = game.colorList[Math.floor(Math.random()*game.colorList.length)]
+    game.curPos = (Math.ceil(Math.random()*(game.cols-5)))
+    if (!game.newGame) setContent(document.all.comment,"&nbsp;")
+    game.newGame=false
+    checkRows()
+    game.shape = game.shapeList[newShape-1]
+    getColOffset(game.shape)
+    game.temp = game.speed 
+    paintIt(0,game.colorCurrent)
+  }
+
+  function doKeyPress() {
+    // process keyboard
+    var key = event.keyCode
+    if (game.inprocess) {
+      if (game.keys.left==key) 
+        if ((!check(-1,false)) && boundary(-1)) 
+            offset(-1)
+      if (game.keys.right==key) 
+        if ((!check(1,false)) && boundary(1)) 
+            offset(1)
+      if (game.keys.rotleft==key) transform("left")
+      if (game.keys.rotright==key) transform("right")
+      if (game.keys.drop==key) { 
+        clearTimeout(tm)
+        game.temp = 5
+        if (!game.pause) tm=setTimeout("doTimer()",game.temp)
+      }
+    }
+  }     
+
+  function doTimer() {
+    var block = false
+    if (check(game.cols))  
+        selectShape()     // get new piece
+    else
+        offset(game.cols) // move down 1 row
+    if ((game.inprocess) && (!game.pause))
+        tm=setTimeout("doTimer()",game.temp) 
+    else 
+      if(!game.inprocess) {
+        clearTimeout(tm)
+        alert("Game Over!")
+        setContent(document.all.comment,"Game Over!")
+       }
+  }
+
+  function cleanup(b) { 
+    game.pause = false
+    game.shapeList = new Array()
+    game.shapeList = game.defaults
+    b.blur()
+    game.newGame=true
+    for (var counter=0;counter<game.rows*game.cols;counter++) {
+        setColor(table[counter], game.bgColor)
+        colors[counter] = false
+    }
+    game.score = 0
+    game.level = game.startLevel
+    game.speed = game.speeds[game.startLevel-1]
+    game.inprocess=true
+    outScore()    
+    setContent(document.all.comment,"<STRONG>Good Luck!</STRONG>")
+    selectShape()
+    doTimer()
+  }
+  
+  
+
+</script>
+</head>
+
+<body BGCOLOR="#EEF8E7" LINK="#005B00" ALINK="#005B00" VLINK="#008000" topmargin="0"
+leftmargin="0">
+<div align="left">
+
+<table border="0" cellpadding="0" cellspacing="0" width="590">
+</table>
+</div><div align="center"><center>
+
+<table STYLE="Position: absolute; top: 10px; left: 20px; width: 250px;">
+  <tr>
+    <td><h2>4-Tris</h2>
+    <p><small><font face="Verdana">An adaptation of your favorite game. This game runs on both
+    Internet Explorer 4.0 and Netscape Communicator 4.0. Warning: This is quite sensitive when
+    you minimize or maximize your browser randomly - Javascript run time will appear error
+    detracted. Please maximize your browser and press the reload button. Thanks and enjoy
+    playing!</font></small></p>
+    <form>
+      <p><input TYPE="button" NAME="start" VALUE="New Game" ONCLICK="cleanup(this)"> <input
+      TYPE="button" NAME="start" VALUE="Close" ONCLICK="window.close()"><br>
+      </p>
+      <p><font SIZE="-1">Contributed by Lemuel Cabia with explicit consent from Scott Isaac of<br>
+      <a ID="home" TARGET="main" onclick="window.close()" href="/home.asp">www.insideDHTML.com</a></font>
+      </p>
+    </form>
+    </td>
+  </tr>
+</table>
+</center></div><div STYLE="position: absolute; top: 70px; left: 460px">
+
+<p><font face="Verdana"><font SIZE="-1"><span CLASS="KEY">J</span> - Move Left<br>
+<span CLASS="KEY">L</span> - Move Right<br>
+<span CLASS="KEY">I</span> - Rotate Left<br>
+<span CLASS="KEY">K</span> - Rotate Right <br>
+<span CLASS="KEY">&lt;SPACE&gt;</span> - Drop</font> </font></p>
+</div><div ID="level" STYLE="position: absolute; top: 49px; left: 300px; width: 75px">
+
+<p>&nbsp;</p>
+</div><div ID="score"
+STYLE="position: absolute; top: 49px; left: 375px; width: 75px; text-align: right">
+
+<p>&nbsp;</p>
+</div><div ID="C0"
+STYLE="position: absolute; top: 70px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C1"
+STYLE="position: absolute; top: 70px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C2"
+STYLE="position: absolute; top: 70px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C3"
+STYLE="position: absolute; top: 70px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C4"
+STYLE="position: absolute; top: 70px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C5"
+STYLE="position: absolute; top: 70px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C6"
+STYLE="position: absolute; top: 70px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C7"
+STYLE="position: absolute; top: 70px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C8"
+STYLE="position: absolute; top: 70px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C9"
+STYLE="position: absolute; top: 70px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C10"
+STYLE="position: absolute; top: 85px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C11"
+STYLE="position: absolute; top: 85px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C12"
+STYLE="position: absolute; top: 85px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C13"
+STYLE="position: absolute; top: 85px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C14"
+STYLE="position: absolute; top: 85px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C15"
+STYLE="position: absolute; top: 85px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C16"
+STYLE="position: absolute; top: 85px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C17"
+STYLE="position: absolute; top: 85px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C18"
+STYLE="position: absolute; top: 85px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C19"
+STYLE="position: absolute; top: 85px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C20"
+STYLE="position: absolute; top: 100px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C21"
+STYLE="position: absolute; top: 100px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C22"
+STYLE="position: absolute; top: 100px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C23"
+STYLE="position: absolute; top: 100px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C24"
+STYLE="position: absolute; top: 100px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C25"
+STYLE="position: absolute; top: 100px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C26"
+STYLE="position: absolute; top: 100px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C27"
+STYLE="position: absolute; top: 100px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C28"
+STYLE="position: absolute; top: 100px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C29"
+STYLE="position: absolute; top: 100px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C30"
+STYLE="position: absolute; top: 115px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C31"
+STYLE="position: absolute; top: 115px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C32"
+STYLE="position: absolute; top: 115px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C33"
+STYLE="position: absolute; top: 115px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C34"
+STYLE="position: absolute; top: 115px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C35"
+STYLE="position: absolute; top: 115px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C36"
+STYLE="position: absolute; top: 115px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C37"
+STYLE="position: absolute; top: 115px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C38"
+STYLE="position: absolute; top: 115px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C39"
+STYLE="position: absolute; top: 115px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C40"
+STYLE="position: absolute; top: 130px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C41"
+STYLE="position: absolute; top: 130px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C42"
+STYLE="position: absolute; top: 130px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C43"
+STYLE="position: absolute; top: 130px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C44"
+STYLE="position: absolute; top: 130px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C45"
+STYLE="position: absolute; top: 130px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C46"
+STYLE="position: absolute; top: 130px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C47"
+STYLE="position: absolute; top: 130px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C48"
+STYLE="position: absolute; top: 130px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C49"
+STYLE="position: absolute; top: 130px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C50"
+STYLE="position: absolute; top: 145px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C51"
+STYLE="position: absolute; top: 145px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C52"
+STYLE="position: absolute; top: 145px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C53"
+STYLE="position: absolute; top: 145px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C54"
+STYLE="position: absolute; top: 145px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C55"
+STYLE="position: absolute; top: 145px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C56"
+STYLE="position: absolute; top: 145px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C57"
+STYLE="position: absolute; top: 145px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C58"
+STYLE="position: absolute; top: 145px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C59"
+STYLE="position: absolute; top: 145px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C60"
+STYLE="position: absolute; top: 160px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C61"
+STYLE="position: absolute; top: 160px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C62"
+STYLE="position: absolute; top: 160px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C63"
+STYLE="position: absolute; top: 160px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C64"
+STYLE="position: absolute; top: 160px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C65"
+STYLE="position: absolute; top: 160px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C66"
+STYLE="position: absolute; top: 160px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C67"
+STYLE="position: absolute; top: 160px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C68"
+STYLE="position: absolute; top: 160px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C69"
+STYLE="position: absolute; top: 160px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C70"
+STYLE="position: absolute; top: 175px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C71"
+STYLE="position: absolute; top: 175px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C72"
+STYLE="position: absolute; top: 175px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C73"
+STYLE="position: absolute; top: 175px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C74"
+STYLE="position: absolute; top: 175px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C75"
+STYLE="position: absolute; top: 175px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C76"
+STYLE="position: absolute; top: 175px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C77"
+STYLE="position: absolute; top: 175px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C78"
+STYLE="position: absolute; top: 175px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C79"
+STYLE="position: absolute; top: 175px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C80"
+STYLE="position: absolute; top: 190px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C81"
+STYLE="position: absolute; top: 190px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C82"
+STYLE="position: absolute; top: 190px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C83"
+STYLE="position: absolute; top: 190px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C84"
+STYLE="position: absolute; top: 190px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C85"
+STYLE="position: absolute; top: 190px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C86"
+STYLE="position: absolute; top: 190px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C87"
+STYLE="position: absolute; top: 190px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C88"
+STYLE="position: absolute; top: 190px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C89"
+STYLE="position: absolute; top: 190px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C90"
+STYLE="position: absolute; top: 205px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C91"
+STYLE="position: absolute; top: 205px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C92"
+STYLE="position: absolute; top: 205px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C93"
+STYLE="position: absolute; top: 205px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C94"
+STYLE="position: absolute; top: 205px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C95"
+STYLE="position: absolute; top: 205px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C96"
+STYLE="position: absolute; top: 205px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C97"
+STYLE="position: absolute; top: 205px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C98"
+STYLE="position: absolute; top: 205px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C99"
+STYLE="position: absolute; top: 205px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C100"
+STYLE="position: absolute; top: 220px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C101"
+STYLE="position: absolute; top: 220px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C102"
+STYLE="position: absolute; top: 220px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C103"
+STYLE="position: absolute; top: 220px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C104"
+STYLE="position: absolute; top: 220px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C105"
+STYLE="position: absolute; top: 220px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C106"
+STYLE="position: absolute; top: 220px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C107"
+STYLE="position: absolute; top: 220px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C108"
+STYLE="position: absolute; top: 220px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C109"
+STYLE="position: absolute; top: 220px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C110"
+STYLE="position: absolute; top: 235px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C111"
+STYLE="position: absolute; top: 235px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C112"
+STYLE="position: absolute; top: 235px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C113"
+STYLE="position: absolute; top: 235px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C114"
+STYLE="position: absolute; top: 235px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C115"
+STYLE="position: absolute; top: 235px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C116"
+STYLE="position: absolute; top: 235px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C117"
+STYLE="position: absolute; top: 235px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C118"
+STYLE="position: absolute; top: 235px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C119"
+STYLE="position: absolute; top: 235px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C120"
+STYLE="position: absolute; top: 250px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C121"
+STYLE="position: absolute; top: 250px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C122"
+STYLE="position: absolute; top: 250px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C123"
+STYLE="position: absolute; top: 250px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C124"
+STYLE="position: absolute; top: 250px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C125"
+STYLE="position: absolute; top: 250px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C126"
+STYLE="position: absolute; top: 250px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C127"
+STYLE="position: absolute; top: 250px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C128"
+STYLE="position: absolute; top: 250px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C129"
+STYLE="position: absolute; top: 250px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C130"
+STYLE="position: absolute; top: 265px; left: 300px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C131"
+STYLE="position: absolute; top: 265px; left: 315px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C132"
+STYLE="position: absolute; top: 265px; left: 330px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C133"
+STYLE="position: absolute; top: 265px; left: 345px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C134"
+STYLE="position: absolute; top: 265px; left: 360px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C135"
+STYLE="position: absolute; top: 265px; left: 375px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C136"
+STYLE="position: absolute; top: 265px; left: 390px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C137"
+STYLE="position: absolute; top: 265px; left: 405px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C138"
+STYLE="position: absolute; top: 265px; left: 420px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="C139"
+STYLE="position: absolute; top: 265px; left: 435px; width: 14px; height: 14px; clip: rect(0,14px,14px,0); overflow: hidden">
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+</div><div ID="comment" STYLE="position: absolute; top: 282px; left: 300px; width: 149px">
+
+<p>&nbsp;</p>
+</div>
+</body>
+</html>
